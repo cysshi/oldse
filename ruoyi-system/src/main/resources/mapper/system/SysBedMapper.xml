@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysBedMapper">
+    
+    <resultMap type="SysBed" id="SysBedResult">
+        <result property="bedId"      column="bed_id"      />
+        <result property="bedNumber"  column="bed_number"  />
+        <result property="price"      column="price"       />
+        <result property="status"     column="status"      />
+        <result property="elderId"    column="elder_id"    />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+        <result property="remark"     column="remark"      />
+        <result property="elderName"  column="elder_name"  />
+        <result property="elderPhone" column="phone"       />
+        <result property="elderGender" column="gender"     />
+        <result property="elderAge"   column="age"         />
+    </resultMap>
+
+    <sql id="selectSysBedVo">
+        select b.bed_id, b.bed_number, b.price, b.status, b.elder_id, b.create_by, b.create_time, b.update_by, b.update_time, b.remark,
+               e.elder_name, e.phone, e.gender, e.age
+        from sys_bed b
+        left join sys_elder e on b.elder_id = e.elder_id
+    </sql>
+
+    <select id="selectSysBedList" parameterType="SysBed" resultMap="SysBedResult">
+        <include refid="selectSysBedVo"/>
+        <where>
+            <if test="bedNumber != null  and bedNumber != ''"> and b.bed_number = #{bedNumber}</if>
+            <if test="price != null "> and b.price = #{price}</if>
+            <if test="status != null  and status != ''"> and b.status = #{status}</if>
+            <if test="elderId != null "> and b.elder_id = #{elderId}</if>
+        </where>
+        order by b.create_time desc
+    </select>
+
+    <select id="selectSysBedById" parameterType="Long" resultMap="SysBedResult">
+        <include refid="selectSysBedVo"/>
+        where b.bed_id = #{bedId}
+    </select>
+        
+    <insert id="insertSysBed" parameterType="SysBed" useGeneratedKeys="true" keyProperty="bedId">
+        insert into sys_bed
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bedNumber != null">bed_number,</if>
+            <if test="elderId != null">elder_id,</if>
+            <if test="price != null">price,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bedNumber != null">#{bedNumber},</if>
+            <if test="elderId != null">#{elderId},</if>
+            <if test="price != null">#{price},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBed" parameterType="SysBed">
+        update sys_bed
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bedNumber != null">bed_number = #{bedNumber},</if>
+            <if test="elderId != null">elder_id = #{elderId},</if>
+            <if test="elderId == null">elder_id = null,</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where bed_id = #{bedId}
+    </update>
+
+    <delete id="deleteSysBedById" parameterType="Long">
+        delete from sys_bed where bed_id = #{bedId}
+    </delete>
+
+    <delete id="deleteSysBedByIds" parameterType="String">
+        delete from sys_bed where bed_id in 
+        <foreach item="bedId" collection="array" open="(" separator="," close=")">
+            #{bedId}
+        </foreach>
+    </delete>
+</mapper> 

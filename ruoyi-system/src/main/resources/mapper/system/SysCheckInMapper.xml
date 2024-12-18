@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysCheckInMapper">
+    
+    <resultMap type="SysCheckIn" id="SysCheckInResult">
+        <result property="checkInId"    column="check_in_id"    />
+        <result property="elderId"      column="elder_id"       />
+        <result property="bedId"        column="bed_id"         />
+        <result property="checkInTime"  column="check_in_time"  />
+        <result property="checkOutTime" column="check_out_time" />
+        <result property="status"       column="status"         />
+        <result property="createBy"     column="create_by"      />
+        <result property="createTime"   column="create_time"    />
+        <result property="updateBy"     column="update_by"      />
+        <result property="updateTime"   column="update_time"    />
+        <result property="remark"       column="remark"         />
+        <result property="elderName"    column="elder_name"     />
+        <result property="bedNumber"    column="bed_number"     />
+    </resultMap>
+
+    <sql id="selectSysCheckInVo">
+        select c.check_in_id, c.elder_id, c.bed_id, c.check_in_time, c.check_out_time, c.status, 
+               c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               e.elder_name, b.bed_number
+        from sys_check_in c
+        left join sys_elder e on c.elder_id = e.elder_id
+        left join sys_bed b on c.bed_id = b.bed_id
+    </sql>
+
+    <select id="selectSysCheckInList" parameterType="SysCheckIn" resultMap="SysCheckInResult">
+        <include refid="selectSysCheckInVo"/>
+        <where>
+            <if test="elderId != null "> and c.elder_id = #{elderId}</if>
+            <if test="bedId != null "> and c.bed_id = #{bedId}</if>
+            <if test="status != null  and status != ''"> and c.status = #{status}</if>
+            <if test="elderName != null  and elderName != ''"> and e.elder_name like concat('%', #{elderName}, '%')</if>
+            <if test="bedNumber != null  and bedNumber != ''"> and b.bed_number = #{bedNumber}</if>
+        </where>
+        order by c.check_in_time desc
+    </select>
+
+    <select id="selectSysCheckInById" parameterType="Long" resultMap="SysCheckInResult">
+        <include refid="selectSysCheckInVo"/>
+        where c.check_in_id = #{checkInId}
+    </select>
+
+    <select id="selectCurrentCheckInByElderId" parameterType="Long" resultMap="SysCheckInResult">
+        <include refid="selectSysCheckInVo"/>
+        where c.elder_id = #{elderId} and c.status = '1'
+        limit 1
+    </select>
+
+    <insert id="insertSysCheckIn" parameterType="SysCheckIn" useGeneratedKeys="true" keyProperty="checkInId">
+        insert into sys_check_in
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="elderId != null">elder_id,</if>
+            <if test="bedId != null">bed_id,</if>
+            <if test="checkInTime != null">check_in_time,</if>
+            <if test="checkOutTime != null">check_out_time,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="elderId != null">#{elderId},</if>
+            <if test="bedId != null">#{bedId},</if>
+            <if test="checkInTime != null">#{checkInTime},</if>
+            <if test="checkOutTime != null">#{checkOutTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysCheckIn" parameterType="SysCheckIn">
+        update sys_check_in
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="elderId != null">elder_id = #{elderId},</if>
+            <if test="bedId != null">bed_id = #{bedId},</if>
+            <if test="checkInTime != null">check_in_time = #{checkInTime},</if>
+            <if test="checkOutTime != null">check_out_time = #{checkOutTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where check_in_id = #{checkInId}
+    </update>
+</mapper> 
